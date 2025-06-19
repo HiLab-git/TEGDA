@@ -32,8 +32,7 @@ import math
 import SimpleITK as sitk
 from pymic.util.evaluation_seg import get_multi_class_evaluation_score
 from sota._tta import *
-from sota.aetta import AETTA
-from sota.aetta4seg import AETTA4Seg
+from sota.adic import ADIC
 import pandas as pd
 
 parser = argparse.ArgumentParser()
@@ -42,7 +41,7 @@ parser.add_argument('--root_path', type=str,
 parser.add_argument('--source_domain', type=str,
                     default='BraTS_GLI', help='The source domain')
 parser.add_argument('--source_checkpoint', type=str,
-                    default='/mnt/data1/ZhouFF/TTA4MIS/model/BraTs2023_Fully_Supervised_GLI/unet_3D/iter_20000_dice_0.7799.pth', help='The source domain checkpoint')
+                    default='', help='The source domain checkpoint')
 parser.add_argument('--target_domain', type=str,
                     default='BraTS_MEN', help='The source domain')
 parser.add_argument('--TTA_method', type=str,
@@ -83,42 +82,18 @@ def setup_TTA_model(base_model, TTA_method):
     elif TTA_method == "sar":
         logging.info("test-time adaptation: SAR")
         model = setup_sar(base_model)
-    elif TTA_method == "upl":
-        logging.info("test-time adaptation: upl")
-        model = setup_upl(base_model)
-    elif TTA_method == "FAR-TTA":
-        logging.info("test-time adaptation: FAR-TTA")
-        model = setup_wjh01(base_model)
-    elif TTA_method == "wesam":
-        logging.info("test-time adaptation: Weakly supervised adaptation for SAM")
-        model = setup_wesam(base_model)
     elif TTA_method == "meant":
         logging.info("test-time adaptation: meant")
         model = setup_meant(base_model)
-    elif TTA_method == "meantimgupdate":
-        logging.info("test-time adaptation: meantimgupdate")
-        model = setup_meantimgupdate(base_model)
+    elif TTA_method == "tegda":
+        logging.info("test-time adaptation: tegda")
+        model = setup_tegda(base_model)
     elif TTA_method == "sitta":
         logging.info("test-time adaptation: sitta")
         model = setup_sitta(base_model)
-    elif TTA_method == "memo":
-        logging.info("test-time adaptation: memo")
-        model = setup_memo(base_model)
-    elif TTA_method == "vsdp":
-        logging.info("test-time adaptation: Vsdp") 
-        model = setup_vsdp(base_model)
-    elif TTA_method == "vdptta":
-        logging.info("test-time adaptation: Visual Domain Prompt for CTTA") 
-        model = setup_vdptta(base_model)
     elif TTA_method == "vptta":
         logging.info("test-time adaptation: VPTTA") 
         model = setup_vptta(base_model)
-    elif TTA_method == "vdptta_2":
-        logging.info("test-time adaptation: Visual Domain Prompt for CTTA 2") 
-        model = setup_vdptta_2(base_model)
-    elif TTA_method == "zff01":
-        logging.info("test-time adaptation: zff01") 
-        model = setup_zff01(base_model)
     else:
         raise "no specific method of {}".format(TTA_method)
     return model

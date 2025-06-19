@@ -34,8 +34,7 @@ import math
 import SimpleITK as sitk
 from pymic.util.evaluation_seg import get_multi_class_evaluation_score
 from sota._tta2d import *
-from sota.aetta2d import AETTA
-from sota.aetta4seg import AETTA4Seg
+from sota.adic import ADIC
 import pandas as pd
 
 parser = argparse.ArgumentParser()
@@ -44,7 +43,7 @@ parser.add_argument('--root_path', type=str,
 parser.add_argument('--source_domain', type=str,
                     default='A', help='The source domain')
 parser.add_argument('--source_checkpoint', type=str,
-                    default='/mnt/data1/ZhouFF/TTA4MIS/model/mms2d_Fully_Supervised_A/unet/source-A-model-latest.pth', help='The source domain checkpoint')
+                    default='', help='The source domain checkpoint')
 parser.add_argument('--target_domain', type=str,
                     default='B', help='The source domain')
 parser.add_argument('--TTA_method', type=str,
@@ -57,7 +56,7 @@ parser.add_argument('--model', type=str,
                     default='unet', help='model_name')
 parser.add_argument('--iterations', type=int,
                     default=1, help='maximum epoch number to test')
-parser.add_argument('--batch_size', type=int, default=24,
+parser.add_argument('--batch_size', type=int, default=10,
                     help='batch_size per gpu')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
@@ -88,18 +87,15 @@ def setup_TTA_model(base_model, TTA_method):
     elif TTA_method == "meant":
         logging.info("test-time adaptation: meant")
         model = setup_meant(base_model)
-    elif TTA_method == "meantimgupdate":
-        logging.info("test-time adaptation: meantimgupdate")
-        model = setup_meantimgupdate(base_model)
+    elif TTA_method == "tegda":
+        logging.info("test-time adaptation: tegda")
+        model = setup_tegda(base_model)
     elif TTA_method == "sitta":
         logging.info("test-time adaptation:sitta ")
         model = setup_sitta(base_model)
     elif TTA_method == "vptta":
         logging.info("test-time adaptation:vptta ")
         model = setup_vptta(base_model)
-    elif TTA_method == "wjh":
-        logging.info("test-time adaptation:wjh ")
-        model = setup_wjh01(base_model)
     else:
         raise "no specific method of {}".format(TTA_method)
     return model
@@ -174,16 +170,15 @@ def train(args, snapshot_path):
     os.makedirs(save_output_dir,exist_ok=True)
     iter_num = 0
     results = []
-    eval = AETTA()
+    eval = ADIC()
     for i_batch, sampled_batch in enumerate(trainloader):
         name, volume_batch, label_batch = sampled_batch['name'], sampled_batch['image'], sampled_batch['label']
         # volume_batch, label_batch = volume_batch.cuda(), label_batch.cuda()
         output = test_batch(model, volume_batch, num_classes=args.num_class)
         
-        # 这里需要设置batch size为1，然后针对每个slice进行测试
         case_result = online_evaluation_slice(name,label_batch[:,0,0],output)[0]
-        # est_1, est_2, est_3, est_avg, mismatch_mask, entropy, var, acc,est_avg_noweight,est_avg_weight_inv = eval.aetta(input=volume_batch,pred=output,model=eval_model, multi_eval=True)
-        est_1, est_2, est_3, est_avg, mismatch_mask, entropy, var, acc = eval.aetta(input=volume_batch,pred=output,model=eval_model, multi_eval=True)
+        # est_1, est_2, est_3, est_avg, mismatch_mask, entropy, var, acc,est_avg_noweight,est_avg_weight_inv = eval.ADIC(input=volume_batch,pred=output,model=eval_model, multi_eval=True)
+        est_1, est_2, est_3, est_avg, mismatch_mask, entropy, var, acc = eval.ADIC(input=volume_batch,pred=output,model=eval_model, multi_eval=True)
         case_result['acc'] = acc
         case_result['var'] = var
         case_result['entropy'] = entropy

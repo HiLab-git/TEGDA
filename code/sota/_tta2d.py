@@ -11,7 +11,7 @@ from sota import tent2d
 from sota import norm2d
 from sota import cotta2d
 from sota import meant2d
-from sota import meant_img_update2d
+from sota import tegda_2d
 from sota import sar2d
 from sota import wjh01_0000
 from sota import sitta_2d
@@ -102,20 +102,20 @@ def setup_meant(model):
     cotta_model = meant2d.TTA(model, anchor_model, optimizer)
     return cotta_model
 
-def setup_meantimgupdate(model):
-    model = meant_img_update2d.configure_model(model)
+def setup_tegda(model):
+    model = tegda_2d.configure_model(model)
     anchor_model = deepcopy(model)
     # model.train()
     # anchor_model.eval()
     optimizer = torch.optim.Adam(model.parameters(),lr=0.00001,betas=(0.5,0.999))
-    mt_model = meant_img_update2d.TTA(model, anchor_model, optimizer)
+    mt_model = tegda_2d.TTA(model, anchor_model, optimizer)
     return mt_model
 
 
 def setup_sitta(model):
     cotta_model = sitta_2d.TTA(model, 
                             repeat_num = 1,
-                            check_p = '/mnt/data1/ZhouFF/TTA4MIS/model/mms2d_Fully_Supervised_A/unet/source-A-model-latest.pth'
+                            check_p = ''
                            )
     return cotta_model
 
@@ -132,18 +132,6 @@ def setup_vptta(model):
     
     return model
 
-def setup_wjh01(model):
-    anchor_model = deepcopy(model)
-    model.train()
-    anchor_model.eval()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.5, 0.999))
-    
-    # 每经过 cfg.OPTIM.STEP_SIZE 步，将学习率减半
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
-    
-    cotta_model = wjh01_0000.TTA(model, anchor_model
-                    )
-    return cotta_model
 
 def setup_optimizer(params):
     """Set up optimizer for tent adaptation.

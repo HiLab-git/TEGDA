@@ -10,20 +10,11 @@ from torchvision import transforms
 from sota import tent
 from sota import norm
 from sota import cotta
-from sota import wjh01_0000
 from sota import meant
-from sota import meant_img_update
-from sota import memo
-from sota import upl
+from sota import tegda
 from sota import sar
-from sota import vida
-from sota import svdp
 from sota import sitta
-from sota import vdptta
 from sota import vptta
-from sota import vdptta_2
-from sota import wesam
-from sota import zff01
 from utils.sam import SAM
 import SimpleITK as sitk
 import math
@@ -74,6 +65,13 @@ def setup_tent(model):
     # logging.info(f"optimizer for adaptation: %s", optimizer)
     return tent_model
 
+def setup_sitta(model):
+    cotta_model = sitta.TTA(model, 
+                            repeat_num = 1,
+                            check_p = ''
+                           )
+    return cotta_model
+
 def setup_cotta(model):
     """Set up tent adaptation.
 
@@ -110,62 +108,13 @@ def setup_meant(model):
     cotta_model = meant.TTA(model, anchor_model, optimizer)
     return cotta_model
 
-def setup_meantimgupdate(model):
+def setup_tegda(model):
     anchor_model = deepcopy(model)
     # model.train()
     # anchor_model.eval()
     optimizer = torch.optim.Adam(model.parameters(),lr=0.00001,betas=(0.5,0.999))
-    mt_model = meant_img_update.TTA(model, anchor_model, optimizer)
+    mt_model = tegda.TTA(model, anchor_model, optimizer)
     return mt_model
-
-def setup_vsdp(model):
-    anchor = deepcopy(model.state_dict())
-    anchor_model = deepcopy(model)
-    ema_model = create_ema_model(model)
-    vsdp_model = svdp.TTA(model,anchor,anchor_model,ema_model)
-    return vsdp_model
-
-def setup_vdptta(model):
-    prompt = vdptta.configure_prompt(size=128)
-    # logging.info(f"prompt for adaptation: %s", prompt.parameters)
-    # Froze the source model. Only optimize the prompt
-    params, param_names = vdptta.collect_params(prompt)
-    model.eval()
-    optimizer = setup_optimizer(params)
-    logging.info(f"params for adaptation: %s", param_names)
-    logging.info(f"optimizer for adaptation: %s", optimizer)
-    vdptta_model = vdptta.VDPTTA(prompt,model,optimizer)
-    
-    return vdptta_model
-
-def setup_vdptta_2(model):
-    prompt = vdptta_2.configure_prompt()
-    # logging.info(f"prompt for adaptation: %s", prompt.parameters)
-    # Froze the source model. Only optimize the prompt
-    # params, param_names = vdptta_2.collect_params(prompt)
-    model.eval()
-    optimizer = optim.Adam(prompt.parameters(),
-                lr=0.02,
-                betas=(0.9, 0.999),
-                weight_decay=0.9)
-    # logging.info(f"params for adaptation: %s", param_names)
-    # logging.info(f"optimizer for adaptation: %s", optimizer)
-    vdptta_model = vdptta_2.VDPTTA_2(prompt,model,optimizer)
-    
-    return vdptta_model
-
-def setup_zff01(model):
-    prompt = zff01.configure_prompt()
-    # logging.info(f"prompt for adaptation: %s", prompt.parameters)
-    # Froze the source model. Only optimize the prompt
-    params, param_names = zff01.collect_params(prompt)
-    model.eval()
-    optimizer = setup_optimizer(params)
-    logging.info(f"params for adaptation: %s", param_names)
-    logging.info(f"optimizer for adaptation: %s", optimizer)
-    zff01_model = zff01.zff01(prompt,model,optimizer)
-    
-    return zff01_model
 
 
 def setup_vptta(model):
@@ -180,74 +129,6 @@ def setup_vptta(model):
     model = vptta.VPTTA(model, optimizer, prompt)
     
     return model
-
-def setup_memo(model):
-    model.train()
-    optimizer = optim.SGD(model.parameters(), lr=0.0001)
-
-    cotta_model = memo.TTA(model,  optimizer )
-    return cotta_model
-
-# def setup_vida(args, model):
-#     model = vida.configure_model(model, cfg)
-#     model_param, vida_param = vida.collect_params(model)
-#     optimizer = setup_optimizer_vida(model_param, vida_param, 5e-07, 2e-07)
-#     vida_model = vida.ViDA(model, optimizer,
-#                            steps=cfg.OPTIM.STEPS,
-#                            episodic=cfg.MODEL.EPISODIC,
-#                            unc_thr = args.unc_thr,
-#                            ema = cfg.OPTIM.MT,
-#                            ema_vida = cfg.OPTIM.MT_ViDA,
-#                            )
-#     return vida_model
-
-
-def setup_upl(model):
-    model.train()
-    num_dec = 4
-    dec_list = []
-    for i in range(1, num_dec+1):
-        print(model)
-        dec_i = deepcopy(model.dec1)
-        setattr(dec_i, 'name', f'dec_{i}')  # 修改属性或添加其他标识符
-        dec_list.append(dec_i)
-    optimizer_params = []
-    # for dec_i in dec_list:
-    #     optimizer_params.extend(dec_i.parameters())
-    optimizer_params.extend(model.enc.parameters())
-    optimizer = setup_optimizer(optimizer_params)
-    upl_model = upl.TTA(model.enc, dec_list, optimizer
-                           )
-    return upl_model
-
-def setup_sitta(model):
-    cotta_model = sitta.TTA(model, 
-                            repeat_num = 1,
-                            check_p = '/mnt/data1/ZhouFF/TTA4MIS/model/BraTs2023_Fully_Supervised_GLI/unet_3D/iter_20000_dice_0.7799.pth'
-                           )
-    return cotta_model
-
-def setup_wesam(model):
-    anchor_model = deepcopy(model)
-    model.train()
-    anchor_model.eval()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001, betas=(0.5, 0.999))
-    wesam_model = wesam.TTA(model, anchor_model, optimizer)
-    
-    return wesam_model
-
-def setup_wjh01(model):
-    anchor_model = deepcopy(model)
-    model.train()
-    anchor_model.eval()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.5, 0.999))
-    
-    # 每经过 cfg.OPTIM.STEP_SIZE 步，将学习率减半
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
-    
-    cotta_model = wjh01_0000.TTA(model, anchor_model
-                    )
-    return cotta_model
 
 def setup_optimizer(params):
     """Set up optimizer for tent adaptation.
