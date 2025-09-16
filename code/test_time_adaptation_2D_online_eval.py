@@ -45,7 +45,7 @@ parser.add_argument('--source_domain', type=str,
 parser.add_argument('--source_checkpoint', type=str,
                     default='', help='The source domain checkpoint')
 parser.add_argument('--target_domain', type=str,
-                    default='B', help='The source domain')
+                    default='B', help='The target domain')
 parser.add_argument('--TTA_method', type=str,
                     default='source_test', help='The TTA methods')
 parser.add_argument('--num_class', type=int,

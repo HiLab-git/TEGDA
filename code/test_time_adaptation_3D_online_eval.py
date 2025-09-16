@@ -43,13 +43,13 @@ parser.add_argument('--source_domain', type=str,
 parser.add_argument('--source_checkpoint', type=str,
                     default='', help='The source domain checkpoint')
 parser.add_argument('--target_domain', type=str,
-                    default='BraTS_MEN', help='The source domain')
+                    default='BraTS_PED', help='The target domain')
 parser.add_argument('--TTA_method', type=str,
                     default='source_test', help='The TTA methods')
 parser.add_argument('--num_class', type=int,
                     default='4', help='The number of class')
 parser.add_argument('--exp', type=str,
-                    default='BraTs2023_GLI2MEN', help='experiment_name')
+                    default='BraTs2023_GLI2PED', help='experiment_name')
 parser.add_argument('--model', type=str,
                     default='unet_3D', help='model_name')
 parser.add_argument('--iterations', type=int,

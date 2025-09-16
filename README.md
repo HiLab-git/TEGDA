@@ -14,10 +14,21 @@ Our contributions are summarized as follows:
 - We introduce ADIC-guided **Self-adaptive Model Updating (SMU)** that consists of ADIC-aware pseudo-label loss weighting and ADIC-aware mean teacher to improve the stability of adaptation.
 
 ## Dataset
-Download the BraTS-GLI and BraTS-PED datasets from [BraTS 2023](https://www.synapse.org/#!Synapse:syn51156910/wiki/), M&Ms datasets from [M&Ms](http://www.ub.edu/mnms) and put them in the corresponding data folders. Use 
-```
-pass
-```
-to preprocess the data and get .csv file for pre-training.
+Download the BraTS-GLI and BraTS-PED datasets from [BraTS 2023](https://www.synapse.org/#!Synapse:syn51156910/wiki/), M&Ms datasets from [M&Ms](http://www.ub.edu/mnms).
 
 ## How to use
+### Source model training
+Use
+```
+python /mnt/data1/ZhouFF/TEGDA/code/train_fully_supervised_2D.py # For M&Ms dataset
+python /mnt/data1/ZhouFF/TEGDA/code/train_fully_supervised_3D.py # For BraTS dataset
+```
+to get the source model for two datasets.
+
+### Test-time adaptation
+Use
+```
+cd code
+./run.sh
+```
+to get the test-time adaptation results on two datasets.
