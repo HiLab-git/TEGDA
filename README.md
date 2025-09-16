@@ -20,15 +20,15 @@ Download the BraTS-GLI and BraTS-PED datasets from [BraTS 2023](https://www.syna
 ### Source model training
 Use
 ```
-python /mnt/data1/ZhouFF/TEGDA/code/train_fully_supervised_2D.py # For M&Ms dataset
-python /mnt/data1/ZhouFF/TEGDA/code/train_fully_supervised_3D.py # For BraTS dataset
+cd code
+python train_fully_supervised_2D.py # For M&Ms dataset
+python train_fully_supervised_3D.py # For BraTS dataset
 ```
 to get the source model for two datasets.
 
 ### Test-time adaptation
 Use
 ```
-cd code
 ./run.sh
 ```
 to get the test-time adaptation results on two datasets.
