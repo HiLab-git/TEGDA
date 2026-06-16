@@ -33,6 +33,7 @@ python train_fully_supervised_2D.py # For M&Ms dataset
 python train_fully_supervised_3D.py # For BraTS dataset
 ```
 to get the source model for two datasets.
+We also provide the trained source model checkpoints at Google Drive: [Source model checkpoints](https://drive.google.com/drive/folders/18xaBybnp2EHssdUTImVX-2ozB776QLEN?usp=sharing), please download them and put them to the corresponding folder.
 
 ### Test-time adaptation
 Use
