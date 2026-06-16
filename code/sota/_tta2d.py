@@ -13,7 +13,6 @@ from sota import cotta2d
 from sota import meant2d
 from sota import tegda_2d
 from sota import sar2d
-from sota import wjh01_0000
 from sota import sitta_2d
 from sota import vptta_2d
 from utils.sam import SAM
