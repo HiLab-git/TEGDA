@@ -1,10 +1,9 @@
-# TEGDA & TEGDA+
+# TEGDA
 ---
-This is the official code for MICCAI 2025 paper "TEGDA: Test-time Evaluation-Guided Dynamic Adaptation for Medical Image Segmentation". The extended journal version "TEGDA+: Test-time Evaluation-Guided Dynamic Adaptation for Medical Image Segmentation" is currently under review, and the TEGDA+ code will be released after acceptance.
 
-## To do
-- [x] TEGDA code is updated
-- [ ] TEGDA+ code will be released after acceptance
+For the extended journal version TEGDA+, please refer to [TEGDAplus](https://github.com/HiLab-git/TEGDAplus).
+
+This is the official code for MICCAI 2025 paper "TEGDA: Test-time Evaluation-Guided Dynamic Adaptation for Medical Image Segmentation".
 
 ## Overall Framework
 ![](pictures/pipeline.png)
